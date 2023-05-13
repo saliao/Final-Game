@@ -28,3 +28,4 @@ const SCALE = 0.5;
 let borderUISize = game.config.height / 15;
 let borderPadding = borderUISize / 3;
 let cursors;
+let score = 0;
