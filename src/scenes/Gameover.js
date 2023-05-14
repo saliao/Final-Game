@@ -10,13 +10,14 @@ class gameOver extends Phaser.Scene {
         this.load.audio('sfx_rocket', './assets/rocket_shot.wav');
     }
     create() {
-        score = 0;
+        this.background = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'gameover').setOrigin(0);
+        //score = 0;
         // menu text configuration
         let menuConfig = {
-            fontFamily: 'Courier',
-            fontSize: '28px',
-            backgroundColor: '#F3B141',
-                color: '#843605',
+            fontFamily: 'Fantasy',
+            fontSize: '36px',
+
+                color: '#FFFF',
                 align: 'right',
                 padding: {
                 top: 5,
@@ -24,11 +25,12 @@ class gameOver extends Phaser.Scene {
             },
             fixedWidth: 0
         }
-        this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding, 'GAME OVER', menuConfig).setOrigin(0.5);
-        this.add.text(game.config.width/2, game.config.height/2, 'Use ←→ arrows to move & (F) to fire', menuConfig).setOrigin(0.5);
-        menuConfig.backgroundColor = "#00FF00";
-        menuConfig.color = '#000';
-        this.add.text(game.config.width/2, game.config.height/2 + borderUISize + borderPadding, 'Press ← for Novice or → for Expert', menuConfig).setOrigin(0.5);
+        this.add.text(game.config.width/2, game.config.height/2 - borderUISize - borderPadding, 'You died..', menuConfig).setOrigin(0.5);
+        menuConfig.fontSize = '28px';
+        this.ScoreField = this.add.text(game.config.width/2, game.config.height/2, 'Score: ' + Math.round(score), menuConfig).setOrigin(0.5);
+ 
+        menuConfig.color = '#FFFF';
+        this.add.text(game.config.width/2, game.config.height/2 + borderUISize + 2*borderPadding, 'Press ← Retry\nPress → Menu', menuConfig).setOrigin(0.5);
 
         // define keys
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
@@ -37,6 +39,7 @@ class gameOver extends Phaser.Scene {
 
     }
     update() {
+        this.ScoreField.txt = 'Score: ' + Math.round(score);
         if (Phaser.Input.Keyboard.JustDown(keyLEFT)) {
           // easy mode
           game.settings = {

@@ -30,12 +30,19 @@ class Runner extends Phaser.Scene {
     
     
     create() {
+        this.bgm = this.sound.add('beats', { 
+            mute: false,
+            volume: 0.4,
+            rate: 1,
+            loop: true 
+        });
+        this.bgm.play();
         keyF = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
         this.timer = 0;
         this.secondtimer = 0;
         this.thirdtimer = 0;
         this.timer4 = 0;
-
+        score = 0;
         this.eggs = 5;
         this.gameOver = false;
         this.anims.create({ 
@@ -93,7 +100,7 @@ class Runner extends Phaser.Scene {
         //this.farmground = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'farmground').setOrigin(0);
         this.farmground2 = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'farmground2').setOrigin(0);
         // print Scene name
-        this.scoreField = this.add.text(game.config.width/2, 30, 'Distance: ' + score + ' feet', { font: '24px Fantasy', fill: '#000' }).setOrigin(0.5);
+        this.scoreField = this.add.text(game.config.width/2, 30, 'Score: ' + score, { font: '24px Fantasy', fill: '#000' }).setOrigin(0.5);
         this.scoreField2 = this.add.text(game.config.width/2, 60, 'Eggs: ' + this.eggs, { font: '24px Fantasy', fill: '#FFFF' }).setOrigin(0.5);
         // make ground tiles group
         this.ground = this.add.group();
@@ -133,24 +140,33 @@ class Runner extends Phaser.Scene {
         this.physics.add.overlap(this.chicken, this.wolfGroup, (chicken, singleWolf) => {
             singleWolf.destroy();
             console.log('wolf hit the chicken!');
+            this.sound.play('bawk');
+            this.bgm.stop();
             this.scene.start("gameoverScene");
           });
         this.physics.add.overlap(this.projectileGroup, this.wolfGroup, (singleProjectile, singleWolf) => {
             console.log('egg hit wolf');
+            this.sound.play('quack');
             singleWolf.destroy();
+            
             singleProjectile.destroy();
+            score += 100;
             
             
           });
         this.physics.add.overlap(this.chicken, this.falconGroup, (chicken, singleFalcon) => {
             singleFalcon.destroy();
             console.log('falcon hit the chicken!');
+            this.sound.play('bawk');
+            this.bgm.stop();
             this.scene.start("gameoverScene");
           });
         this.physics.add.overlap(this.projectileGroup, this.falconGroup, (singleProjectile, singleFalcon) => {
             console.log('egg hit falcon');
+            this.sound.play('caw');
             singleFalcon.destroy();
             singleProjectile.destroy();
+            score += 200;
             
             
           });
@@ -202,6 +218,9 @@ class Runner extends Phaser.Scene {
         //missile.setOffset(0, 150);
       }
     update(time, delta) {
+        if (score > highscore){
+            highscore = score;
+        }
         this.timer += delta;
         this.timer4 += delta;
         this.secondtimer += delta;
@@ -209,7 +228,7 @@ class Runner extends Phaser.Scene {
         if (this.timer >= 5000) { //5000
           console.log('Egg time');
           this.createDuck(450, 'Egg');
-          
+          this.bgm.rate += 0.01;   
           this.timer = 0;
         }
 
@@ -243,8 +262,8 @@ class Runner extends Phaser.Scene {
         }
 
 
-        score += 0.10;//+(this.SCROLL_SPEED)/50;//0.10
-        this.scoreField.text = 'Distance: ' + Math.round(score) + ' m';
+        score += 0.10 +(this.SCROLL_SPEED)/50;//0.10
+        this.scoreField.text = 'Score: ' + Math.round(score);
         this.scoreField2.text = 'Eggs: ' + this.eggs;
         //this.SCROLL_SPEED += 0.001;
         this.talltrees.tilePositionX += this.SCROLL_SPEED*0.1;
@@ -265,6 +284,7 @@ class Runner extends Phaser.Scene {
         if(Phaser.Input.Keyboard.JustDown(keyF) && this.eggs > 0) { //150
 	        console.log("fire");
             this.shooteggs('Egg');
+            this.sound.play('bawk');
 
 	    }
         // allow steady velocity change up to a certain key down duration
@@ -272,6 +292,8 @@ class Runner extends Phaser.Scene {
 	    if(this.jumps > 0 && Phaser.Input.Keyboard.DownDuration(cursors.up, 100)) { //150
 	        this.chicken.body.velocity.y = this.JUMP_VELOCITY;
 	        this.jumping = true;
+            this.sound.play('flap');
+            
             console.log("fire");
 	        //this.upKey.tint = 0xFACADE;
 	    } else {
