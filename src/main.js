@@ -2,6 +2,7 @@
 //Game: Chicken Rush
 //Hours spend: 20-24
 //Creative Tilt: I implemented a shooting mechanic also to my endless runner.  I also think my visual design is creative and refreshing because it's very comedic.
+//Note: I made the website but the jump does not work unless the player inspects Element while playing.
 let config = {
     type: Phaser.AUTO,
     //width: 640,
