@@ -6,7 +6,12 @@ class play extends Phaser.Scene {
     preload() {
         this.load.spritesheet('resident1Walk', './assets/resident1anim.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 8});
         this.load.spritesheet('resident1Idle', './assets/resident1-idlet.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 3});
-        this.load.spritesheet('resident2Walk', './assets/resident1anim2.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 8});
+        this.load.spritesheet('resident2Walk', './assets/resident2walk.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 8});
+        this.load.spritesheet('resident2Idle', './assets/resident2idle.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 3});
+        this.load.spritesheet('resident3Walk', './assets/resident3walk.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 8});
+        this.load.spritesheet('resident3Idle', './assets/resident3idle.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 3});
+        this.load.spritesheet('resident4Walk', './assets/resident4walk.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 8});
+        this.load.spritesheet('resident4Idle', './assets/resident4idle.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 3});
         this.load.audio('sfx_select', './assets/blip_select12.wav');
         //this.load.path = './assets/'
         this.load.image('man', "./assets/man.png")
@@ -28,26 +33,50 @@ class play extends Phaser.Scene {
 
     }
     create() {
+
+        //All my animations
         this.anims.create({ 
             key: 'walk', 
             frames: this.anims.generateFrameNames('resident1Walk', {      
                 start: 0,
-                end: 1,
+                end: 7,
                 nextAnim: "resident1Walk",
                  
             }), 
-            frameRate: 10,
+            frameRate: 5,
             repeat: -1 
         });
         this.anims.create({ 
             key: 'walk2', 
             frames: this.anims.generateFrameNames('resident2Walk', {      
                 start: 0,
-                end: 1,
+                end: 7,
                 nextAnim: "resident2Walk",
                  
             }), 
-            frameRate: 10,
+            frameRate: 5,
+            repeat: -1 
+        });
+        this.anims.create({ 
+            key: 'walk3', 
+            frames: this.anims.generateFrameNames('resident3Walk', {      
+                start: 0,
+                end: 7,
+                nextAnim: "resident3Walk",
+                 
+            }), 
+            frameRate: 5,
+            repeat: -1 
+        });
+        this.anims.create({ 
+            key: 'walk4', 
+            frames: this.anims.generateFrameNames('resident4Walk', {      
+                start: 0,
+                end: 7,
+                nextAnim: "resident4Walk",
+                 
+            }), 
+            frameRate: 5,
             repeat: -1 
         });
         this.anims.create({ 
@@ -56,6 +85,39 @@ class play extends Phaser.Scene {
                 start: 0,
                 end: 1,
                 nextAnim: "resident1Idle",
+                 
+            }), 
+            frameRate: 10,
+            //repeat: -1 
+        });
+        this.anims.create({ 
+            key: 'idle2', 
+            frames: this.anims.generateFrameNames('resident2Idle', {      
+                start: 0,
+                end: 1,
+                nextAnim: "resident2Idle",
+                 
+            }), 
+            frameRate: 10,
+            //repeat: -1 
+        });
+        this.anims.create({ 
+            key: 'idle3', 
+            frames: this.anims.generateFrameNames('resident3Idle', {      
+                start: 0,
+                end: 1,
+                nextAnim: "resident3Idle",
+                 
+            }), 
+            frameRate: 10,
+            //repeat: -1 
+        });
+        this.anims.create({ 
+            key: 'idle4', 
+            frames: this.anims.generateFrameNames('resident4Idle', {      
+                start: 0,
+                end: 1,
+                nextAnim: "resident4Idle",
                  
             }), 
             frameRate: 10,
@@ -161,11 +223,15 @@ class play extends Phaser.Scene {
        
         
        this.guy1= this.people.create(220, 120, 'resident1');
+       this.guy1.setName("guy1");
        this.guy2= this.people.create(220, 225, 'resident2');
-       
+       this.guy2.setName("guy2");
        this.guy3= this.people.create(220, 330, 'resident3');
+       this.guy3.setName("guy3");
        this.guy4= this.people.create(220, 435, 'resident4');
+       this.guy4.setName("guy4");
        this.pickedguy = this.guy4;
+       
        player1 = 'resident4'
 
        
@@ -177,8 +243,8 @@ class play extends Phaser.Scene {
             item.setInteractive();
 
             item.on('pointerdown', function(pointer){
-                console.log('you clicked ' + item.texture.key)
-                clickedtarget = item.texture.key
+                console.log('you clicked ' + item.name)
+                clickedtarget = item.name
                 cam.startFollow(this);
     
                 cam.setZoom(4);
@@ -199,11 +265,12 @@ class play extends Phaser.Scene {
         this.Dialogue2.color = '#FFFFFF'
         this.iswalking = false;
         
+        
 
     }
    //How NPCs or regular residents will move
   
-    random(object){
+    random(object,walkanim,idleanim){
         //console.log('move time for: '+object);
             //console.log('you clicked ')
             let thing = Math.random();
@@ -211,14 +278,14 @@ class play extends Phaser.Scene {
             this.direction.x = Math.random() < 0.5 ? -1 : 1;
                 
             if (this.direction.x < 0) {
-                //object.anims.play('walk',true);
+                object.anims.play(walkanim,true);
                 
                 object.flipX=true;
                 
             }
             else if (this.direction.x > 0) {
         
-               // object.anims.play('walk',true);
+                object.anims.play(walkanim,true);
                 object.flipX=false;
                     
             }
@@ -227,7 +294,7 @@ class play extends Phaser.Scene {
 
 
                 object.flipX=false;
-                //object.anims.play('idle');
+                object.anims.play(idleanim);
             }
             this.direction.normalize()
             object.setVelocityX(this.VEL * this.direction.x)
@@ -245,27 +312,29 @@ class play extends Phaser.Scene {
             // this.direction.x = Math.random() < 0.5 ? -1 : 1;
              this.timer = 0;
              
-             if(this.pickedguy.texture.key == 'resident4'&&this.selction_phase==false){
-             this.random(this.guy1)
-             this.random(this.guy2)
-             this.random(this.guy3)
+             if(this.pickedguy== this.guy4 &&this.selction_phase==false){
+            
+             this.random(this.guy1,"walk","idle")
+             this.random(this.guy2,"walk2","idle2")
+             this.random(this.guy3,"walk3","idle3")
              }
-            else if(this.pickedguy.texture.key == 'resident1'&&this.selction_phase==false){
-                this.random(this.guy4)
-                this.random(this.guy2)
-                this.random(this.guy3)
+            else if(this.pickedguy == this.guy1&&this.selction_phase==false){
+                this.random(this.guy4,"walk4","idle4")
+                this.random(this.guy2,"walk2","idle2")
+                this.random(this.guy3,"walk3","idle3")
+                console.log("blueman");
             }
-            else if(this.pickedguy.texture.key == 'resident2'&&this.selction_phase==false){
+            else if(this.pickedguy == this.guy2&&this.selction_phase==false){
                     
-                    this.random(this.guy3)
-                    this.random(this.guy4)
-                    this.random(this.guy1)
+                    this.random(this.guy3,"walk3","idle3")
+                    this.random(this.guy4,"walk4","idle4")
+                    this.random(this.guy1,"walk","idle")
                     
             }
-            else if(this.pickedguy.texture.key == 'resident3'&&this.selction_phase==false){
-                this.random(this.guy4)
-                this.random(this.guy2)
-                this.random(this.guy1)
+            else if(this.pickedguy == this.guy3&&this.selction_phase==false){
+                this.random(this.guy4,"walk4","idle4")
+                this.random(this.guy2,"walk2","idle2")
+                this.random(this.guy1,"walk","idle")
             }
             
           }
@@ -287,6 +356,7 @@ class play extends Phaser.Scene {
         this.scoreCenter.text = Math.round(this.time_left/1000);
         //console.log(this.time_left/1000);
         }
+        
         this.timer += delta;
         this.direction = new Phaser.Math.Vector2(0)
 
@@ -295,42 +365,81 @@ class play extends Phaser.Scene {
             this.direction.x = -1
             //this.people.flipX=true;
              this.pickedguy.flipX=true;
-             this.iswalking = true;
+             //this.iswalking = true;
+             if (this.pickedguy ==this.guy1){
+                this.pickedguy.anims.play('walk',true);
+             }
+             else if (this.pickedguy ==this.guy2){
+                this.pickedguy.anims.play('walk2',true);
+             }
+             else if (this.pickedguy ==this.guy3){
+                this.pickedguy.anims.play('walk3',true);
+             }
+             else if (this.pickedguy ==this.guy4){
+                this.pickedguy.anims.play('walk4',true);
+             }
             
         } else if (this.cursors.right.isDown&&this.selction_phase==false) {
             this.direction.x = 1
             //this.people.flipX=false;
             //this.object
+            if (this.pickedguy ==this.guy1){
+                this.pickedguy.anims.play('walk',true);
+             }
+             else if (this.pickedguy ==this.guy2){
+                this.pickedguy.anims.play('walk2',true);
+             }
+             else if (this.pickedguy ==this.guy3){
+                this.pickedguy.anims.play('walk3',true);
+             }
+             else if (this.pickedguy ==this.guy4){
+                this.pickedguy.anims.play('walk4',true);
+             }
              this.pickedguy.flipX=false;
              
-             this.iswalking = true;
+             //this.iswalking = true;
+             
             
 
 
+        }
+        else if (this.cursors.right.isDown == false && this.cursors.left.isDown == false &&this.selction_phase==false){
+            if (this.pickedguy ==this.guy1){
+                this.pickedguy.anims.play('idle',true);
+             }
+             else if (this.pickedguy ==this.guy2){
+                this.pickedguy.anims.play('idle2',true);
+             }
+             else if (this.pickedguy ==this.guy3){
+                this.pickedguy.anims.play('idle3',true);
+             }
+             else if (this.pickedguy ==this.guy4){
+                this.pickedguy.anims.play('idle4',true);
+             }
         }
         
         
         //this.cursors.down.isDown
         //selecting character
-        else if (Phaser.Input.Keyboard.JustDown(key1)){
+        else if (Phaser.Input.Keyboard.JustDown(key1) && this.selction_phase == true){
             this.pickedguy = this.guy1;
             this.sound.play('sfx_select');
             player1 = "resident1"
 
         }
-        else if (Phaser.Input.Keyboard.JustDown(key2)){
+        else if (Phaser.Input.Keyboard.JustDown(key2) && this.selction_phase == true){
             this.pickedguy = this.guy2;
             this.sound.play('sfx_select');
             player1 = "resident2"
 
         }
-        else if (Phaser.Input.Keyboard.JustDown(key3)){
+        else if (Phaser.Input.Keyboard.JustDown(key3) && this.selction_phase == true){
             this.pickedguy = this.guy3;
             this.sound.play('sfx_select');
             player1 = "resident3"
 
         }
-        else if (Phaser.Input.Keyboard.JustDown(key4)){
+        else if (Phaser.Input.Keyboard.JustDown(key4) && this.selction_phase == true){
             this.pickedguy = this.guy4;
             this.sound.play('sfx_select');
             player1 = "resident4"
@@ -351,7 +460,7 @@ class play extends Phaser.Scene {
             //this.cameras.main.pan(420, 262.5, 1, 'Power2');
             
             console.log(clickedtarget);
-            if (clickedtarget ==this.pickedguy.texture.key){
+            if (clickedtarget ==this.pickedguy.name){
                 this.sound.play('sfx_select');
                 console.log("right person!");
                 this.scene.start('p2wonScene');
@@ -382,15 +491,15 @@ class play extends Phaser.Scene {
         //   if(this.iswalking == false){
         //   this.pickedguy.anims.play("idle");
         //   }
-        if (this.iswalking == true) {
-            //this.pickedguy.anims.play("walk2",true);
-            this.iswalking == false;
-           }
-        else if(this.iswalking == false) {
-            //this.pickedguy.anims.play("idle");
-            //this.iswalking == false;
+        // if (this.iswalking == true) {
+        //     //this.pickedguy.anims.play("walk2",true);
+        //     this.iswalking == false;
+        //    }
+        // else if(this.iswalking == false) {
+        //     //this.pickedguy.anims.play("idle");
+        //     //this.iswalking == false;
             
-        }
+        // }
         
 
 

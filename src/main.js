@@ -15,7 +15,7 @@ The round will not start yet, or residents don't move yet until someone press ke
 * Press Q to zoom out and stop following character.
 * Note: player 2 should no look at player's hand while he is press the keys.
 ### 
-* Phaser components: Physics/Collision, Camera zoom and follow, animation(in progress), tilemap for building, text objects. *All in play.js
+* Phaser components: Physics/Collision, Camera zoom and follow, animation for residents, tilemap for building, text objects. *All in play.js
 */
 
 let config = {
