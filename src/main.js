@@ -14,7 +14,10 @@ The round will not start yet, or residents don't move yet until someone press ke
 * While zoomed in on character, press 'F' to guess him.  You only get one try.
 * Press Q to zoom out and stop following character.
 * Note: player 2 should no look at player's hand while he is press the keys.
+### 
+* Phaser components: Physics/Collision, Camera zoom and follow, animation(in progress), tilemap, text objects. *All in play.js
 */
+
 let config = {
     type: Phaser.AUTO,
     //width: 640,
@@ -27,7 +30,7 @@ let config = {
     physics: {
         default: 'arcade',
         arcade: {
-            //\\debug: true,
+            debug: true,
             gravity: {
                 x: 0,
                 y: 0
@@ -35,7 +38,7 @@ let config = {
         }
     },
 
-    scene: [play, Menu, gameOver, tutorial, credits, player2wins,timeOver]
+    scene: [ Menu, play, gameOver, tutorial, credits, player2wins,timeOver]
 
 }
 
@@ -46,6 +49,7 @@ let clickedtarget = "";
 const tileSize =35*1.2;
 const SCALE = 0.5;
 // set UI sizes
+let player1 = "resident4";
 let borderUISize = game.config.height / 15;
 let borderPadding = borderUISize / 3;
 let cursors;

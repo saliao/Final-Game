@@ -4,7 +4,7 @@ class Person extends Phaser.GameObjects.Sprite {
         super(scene, x, y, texture, frame); 
         //scene.physics.add.existing(this);
         this.timer = 0;
-        scene.people.create(x, y, texture);
+        scene.people.create(this);
         this.setDepth(-1);
         //this.points = pointValue;
         //this.moveSpeed = game.settings.spaceshipSpeed;
@@ -24,9 +24,8 @@ class Person extends Phaser.GameObjects.Sprite {
             if(thing < 0.5) {
                 this.direction.x = 0;
             }
-            
-            this.direction.normalize()
-            this.body.setVelocityX(50 * this.direction.x)
+            this.guy.direction.normalize()
+            this.guy.setVelocityX(50 * this.direction.x)
           }
 
         // this.x -= this.moveSpeed;

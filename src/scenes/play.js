@@ -4,22 +4,66 @@ class play extends Phaser.Scene {
         this.VEL = 50;
     }
     preload() {
+        this.load.spritesheet('resident1Walk', './assets/resident1anim.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 8});
+        this.load.spritesheet('resident1Idle', './assets/resident1-idlet.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 3});
+        this.load.spritesheet('resident2Walk', './assets/resident1anim2.png',{frameWidth: 35, frameHeight: 70, startFrame: 0, endFrame: 8});
         this.load.audio('sfx_select', './assets/blip_select12.wav');
         //this.load.path = './assets/'
         this.load.image('man', "./assets/man.png")
+        this.load.image('resident1', "./assets/resident1.png")
+        this.load.image('resident2', "./assets/resident2.png")
+        this.load.image('resident3', "./assets/resident3.png")
+        this.load.image('resident4', "./assets/resident4.png")
         this.load.image('man2', "./assets/man2.png")
         this.load.image('man3', "./assets/man3.png")
         this.load.image('man4', "./assets/man4.png")
-        //this.load.image('chicken',"./assets/chicken.png")
+       
+        this.load.image('rooms','./assets/roooms_back.png')
         this.load.image('tilesetImage','./assets/buildingtileset.png')
+        this.load.image('sky','./assets/sky.png')
         this.load.image('buildingimage','./assets/building.png')
-        //this.load.image('duck','./assets/duck.png')
+        
         this.load.image('frame','./assets/framewindow.png')
         this.load.tilemapTiledJSON('tilemapJson', './assets/area01tmx.json')
 
     }
     create() {
+        this.anims.create({ 
+            key: 'walk', 
+            frames: this.anims.generateFrameNames('resident1Walk', {      
+                start: 0,
+                end: 1,
+                nextAnim: "resident1Walk",
+                 
+            }), 
+            frameRate: 10,
+            repeat: -1 
+        });
+        this.anims.create({ 
+            key: 'walk2', 
+            frames: this.anims.generateFrameNames('resident2Walk', {      
+                start: 0,
+                end: 1,
+                nextAnim: "resident2Walk",
+                 
+            }), 
+            frameRate: 10,
+            repeat: -1 
+        });
+        this.anims.create({ 
+            key: 'idle', 
+            frames: this.anims.generateFrameNames('resident1Idle', {      
+                start: 0,
+                end: 1,
+                nextAnim: "resident1Idle",
+                 
+            }), 
+            frameRate: 10,
+            //repeat: -1 
+        });
         this.gameover = false
+
+        //setting up an in game timer.  After 30 seconds game ends.
         this.time_left = 30000
         let timeConfig = {
             fontFamily: 'space mission',
@@ -42,6 +86,8 @@ class play extends Phaser.Scene {
         key2 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TWO);
         key3 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
         key4 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.FOUR);
+        keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         this.selction_phase = true;
         this.start = false;
         this.timer = 0;
@@ -50,11 +96,16 @@ class play extends Phaser.Scene {
 
         //add layer
         const bgLayer = map.createLayer('Background', tileset, 0, 0).setDepth(0)
-
-        //add player
+        //add rooms
+        this.Rooms = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'rooms').setOrigin(0)
+        this.Rooms.setDepth(-100);
+        //sky
+        this.Sky = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'sky').setOrigin(0)
+        this.Sky.setDepth(-110);
+        //add NPCs
         this.people = this.physics.add.group([
         //     {
-        //     key: 'smoker',
+        //     key: 'man3',
         //     setXY: {
         //         x:220,
         //         y:119
@@ -67,7 +118,7 @@ class play extends Phaser.Scene {
         //     }
         // },
         // {
-        //     key: 'duck',
+        //     key: 'man2',
         //     setXY: {
         //         x:220,
         //         y:225
@@ -76,7 +127,7 @@ class play extends Phaser.Scene {
         //     }
         // },
         // {
-        // key: 'chicken',
+        // key: 'man1',
         //     setXY: {
         //         x:220,
         //         y:225
@@ -91,7 +142,9 @@ class play extends Phaser.Scene {
         this.cursors = this.input.keyboard.createCursorKeys();
         //this.npc.setInteractive();
 
+        //Physics and collision
         bgLayer.setCollisionByProperty({collides: true});
+        //Tilemap, just the building blocks layout.  Residents can collide with apartment blocks.
         this.physics.add.collider(this.people, bgLayer);
         this.building = this.add.tileSprite(0, 0, game.config.width, game.config.height, 'buildingimage').setOrigin(0);
         this.building.setDepth(1);
@@ -105,28 +158,19 @@ class play extends Phaser.Scene {
         this.cameras.main.setBounds(0, 0, 840, 840);
         
     
-        // this.input.on('pointerdown', function () {
-        //     if(pointer.x == this.chicken.x && pointer.y == this.chicken.x){
-        //     var cam = this.cameras.main;
-        //     cam.startFollow(this.npc);
-        //         cam.pan(this.npc.x, this.npc.y, 1, 'Power2');
-        //         //cam.centerOn(this.npc.x, this.npc.y)
-        //         //cam.zoomTo(4, 3000);
-                
-        //         cam.setZoom(2.5);
-        //     }
-    
-        // }, this);
-        //this.input.on('gameobjectdown',this.onObjectClicked);
-        //this.chicken = new Person(this,220, 225, 'chicken');
-        
-       this.guy1= this.people.create(220, 120, 'man');
-       this.guy2= this.people.create(220, 225, 'man2');
        
-       this.guy3= this.people.create(220, 330, 'man3');
-       this.guy4= this.people.create(220, 435, 'man4');
+        
+       this.guy1= this.people.create(220, 120, 'resident1');
+       this.guy2= this.people.create(220, 225, 'resident2');
+       
+       this.guy3= this.people.create(220, 330, 'resident3');
+       this.guy4= this.people.create(220, 435, 'resident4');
        this.pickedguy = this.guy4;
+       player1 = 'resident4'
+
+       
        //this.chicken.setDepth(-1);
+       //How player 2 can watch the residents.  The camera will zoom in on each item of people when they are clicked and main phaser camera will follow it.
         var cam = this.cameras.main;
         Phaser.Actions.Call(this.people.getChildren(), function(item){
             // make item interative
@@ -153,30 +197,37 @@ class play extends Phaser.Scene {
         this.Dialogue2 =this.add.text(game.config.width/2, game.config.height-10, 'Player 2: Press S to start').setOrigin(0.5);
         this.Dialogue2.setDepth(1000)
         this.Dialogue2.color = '#FFFFFF'
-        
+        this.iswalking = false;
         
 
     }
-    // onObjectClicked() {
-    //     var cam = this.cameras.main;
-    //          cam.startFollow(this.npc);
-    //     //         cam.pan(this.npc.x, this.npc.y, 1, 'Power2');
-    //     //         //cam.centerOn(this.npc.x, this.npc.y)
-    //     //         //cam.zoomTo(4, 3000);
-                
-    //              cam.setZoom(2.5);
-    //     //     }
-
-    // }
+   //How NPCs or regular residents will move
+  
     random(object){
         //console.log('move time for: '+object);
             //console.log('you clicked ')
             let thing = Math.random();
             
             this.direction.x = Math.random() < 0.5 ? -1 : 1;
-            
+                
+            if (this.direction.x < 0) {
+                //object.anims.play('walk',true);
+                
+                object.flipX=true;
+                
+            }
+            else if (this.direction.x > 0) {
+        
+               // object.anims.play('walk',true);
+                object.flipX=false;
+                    
+            }
             if(thing < 0.5) {
                 this.direction.x = 0;
+
+
+                object.flipX=false;
+                //object.anims.play('idle');
             }
             this.direction.normalize()
             object.setVelocityX(this.VEL * this.direction.x)
@@ -184,57 +235,108 @@ class play extends Phaser.Scene {
 
 
     }
+    npcwalk(){
+        if (this.timer >= 1000 &&this.selction_phase==false) { //5000
+            // console.log('move time');
+            // //this.createDuck(450, 'Egg');
+            // //this.bgm.rate += 0.01; 
+            // let thing = Math.random();
+            
+            // this.direction.x = Math.random() < 0.5 ? -1 : 1;
+             this.timer = 0;
+             
+             if(this.pickedguy.texture.key == 'resident4'&&this.selction_phase==false){
+             this.random(this.guy1)
+             this.random(this.guy2)
+             this.random(this.guy3)
+             }
+            else if(this.pickedguy.texture.key == 'resident1'&&this.selction_phase==false){
+                this.random(this.guy4)
+                this.random(this.guy2)
+                this.random(this.guy3)
+            }
+            else if(this.pickedguy.texture.key == 'resident2'&&this.selction_phase==false){
+                    
+                    this.random(this.guy3)
+                    this.random(this.guy4)
+                    this.random(this.guy1)
+                    
+            }
+            else if(this.pickedguy.texture.key == 'resident3'&&this.selction_phase==false){
+                this.random(this.guy4)
+                this.random(this.guy2)
+                this.random(this.guy1)
+            }
+            
+          }
+    }
     update(time, delta) {
+        
+        this.Sky.tilePositionX -= 0.1;
         if (this.gameover==true){
             this.scene.start("timeoverScene");
 
         }
-        // if(this.selction_phase==true){
-        //     this.time_left = 60000;
-        // }
+        
+        
         if(this.selction_phase==false && this.time_left <=0){
             this.gameover = true;
         }
         if(this.selction_phase==false){
         this.time_left -= delta;
         this.scoreCenter.text = Math.round(this.time_left/1000);
-        console.log(this.time_left/1000);
+        //console.log(this.time_left/1000);
         }
         this.timer += delta;
         this.direction = new Phaser.Math.Vector2(0)
 
-
+        
         if(this.cursors.left.isDown &&this.selction_phase==false){
             this.direction.x = -1
-            this.people.flipX=true;
+            //this.people.flipX=true;
+             this.pickedguy.flipX=true;
+             this.iswalking = true;
+            
         } else if (this.cursors.right.isDown&&this.selction_phase==false) {
             this.direction.x = 1
-            this.people.flipX=false;
+            //this.people.flipX=false;
+            //this.object
+             this.pickedguy.flipX=false;
+             
+             this.iswalking = true;
+            
+
 
         }
+        
+        
         //this.cursors.down.isDown
         //selecting character
-        else if (Phaser.Input.Keyboard.JustDown(key1)&&this.selction_phase == true){
+        else if (Phaser.Input.Keyboard.JustDown(key1)){
             this.pickedguy = this.guy1;
             this.sound.play('sfx_select');
+            player1 = "resident1"
 
         }
-        else if (Phaser.Input.Keyboard.JustDown(key2)&&this.selction_phase == true){
+        else if (Phaser.Input.Keyboard.JustDown(key2)){
             this.pickedguy = this.guy2;
             this.sound.play('sfx_select');
+            player1 = "resident2"
 
         }
-        else if (Phaser.Input.Keyboard.JustDown(key3)&&this.selction_phase == true){
+        else if (Phaser.Input.Keyboard.JustDown(key3)){
             this.pickedguy = this.guy3;
             this.sound.play('sfx_select');
+            player1 = "resident3"
 
         }
-        else if (Phaser.Input.Keyboard.JustDown(key4)&&this.selction_phase == true){
+        else if (Phaser.Input.Keyboard.JustDown(key4)){
             this.pickedguy = this.guy4;
             this.sound.play('sfx_select');
+            player1 = "resident4"
 
         }
-        else if (Phaser.Input.Keyboard.JustDown(keyQ)){
+        if (Phaser.Input.Keyboard.JustDown(keyQ)){
             //this.cameras.main.pan(420, 262.5, 1, 'Power2');
             
             this.cameras.main.stopFollow()
@@ -266,62 +368,29 @@ class play extends Phaser.Scene {
             }
 
         }
-        else if (this.cursors.up.isDown){
-            //this.cameras.main.pan(420, 262.5, 1, 'Power2');
-            
-            //this.cameras.main.startFollow(pointer.x, pointer.y);
-            //this.cameras.main.clearAlpha();
-            //this.cameras.main.centerToSize;
-            //this.cameras.main.setZoom(1);
-            //this.cameras.main.centerOn(420, 262.5);
-
-        }
+        
         else if (Phaser.Input.Keyboard.JustDown(keyS) && this.selction_phase == true){
             this.selction_phase = false;
-            this.Dialogue1.text = "Player 1: Press left or right arrow key to move charater"
+            this.Dialogue1.text = "Player 1: Press left or right arrow key to move character"
             this.Dialogue2.text = "Player 2: Click on resident to observe, Press F to guess and Q to zoom out."
             this.sound.play('sfx_select');
         }
         this.direction.normalize()
         this.pickedguy.setVelocityX(this.VEL * this.direction.x);
-        if (this.timer >= 1000 &&this.selction_phase==false) { //5000
-            // console.log('move time');
-            // //this.createDuck(450, 'Egg');
-            // //this.bgm.rate += 0.01; 
-            // let thing = Math.random();
+        //this.pickedguy.anims.play("walk",true);
+        this.npcwalk();
+        //   if(this.iswalking == false){
+        //   this.pickedguy.anims.play("idle");
+        //   }
+        if (this.iswalking == true) {
+            //this.pickedguy.anims.play("walk2",true);
+            this.iswalking == false;
+           }
+        else if(this.iswalking == false) {
+            //this.pickedguy.anims.play("idle");
+            //this.iswalking == false;
             
-            // this.direction.x = Math.random() < 0.5 ? -1 : 1;
-             this.timer = 0;
-             
-             if(this.pickedguy.texture.key == 'man4'){
-             this.random(this.guy1)
-             this.random(this.guy2)
-             this.random(this.guy3)
-             }
-            else if(this.pickedguy.texture.key == 'man'){
-                this.random(this.guy4)
-                this.random(this.guy2)
-                this.random(this.guy3)
-            }
-            else if(this.pickedguy.texture.key == 'man2'){
-                    
-                    this.random(this.guy3)
-                    this.random(this.guy4)
-                    this.random(this.guy1)
-                    
-            }
-            else if(this.pickedguy.texture.key == 'man3'){
-                this.random(this.guy4)
-                this.random(this.guy2)
-                this.random(this.guy1)
-            }
-             //this.random(this.guy4)
-            // if(thing < 0.5) {
-            //     this.direction.x = 0;
-            // }
-            // this.direction.normalize()
-            // this.people.setVelocityX(this.VEL * this.direction.x)
-          }
+        }
         
 
 
